@@ -2,6 +2,9 @@
 #include <random>
 #include <cmath>
 #include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -254,13 +257,92 @@ if(random_gen == true)
 // =========================================
 else  
 {
+    /*
+    ATENTIE:  matricea de raspuns din .csv are pe linii raspunsul functie de grupul de energie si pe coloane tipul de detector (invers de cum ar trebui),
+              si la fel si fluentele din .csv.
+           :  valorile care reprezinta spectrele de neutroni phi(E) in IAEA TRS403 sunt fluentele de grup impartite la intervalul de letargie
+              (i.e. ln(E_i+1) - ln(E_i)).
+           :  in fisierele .csv prima coloana este energia in [eV].
+    */
 
+    // --------------------------------------
+    // | Citirea datelor din fisierele .csv |
+    // --------------------------------------
+    ifstream ifile;
+    string filename_phi, filename_R;
+    int n_samples = 0, n_energy_groups = 0, n_detectors = 0;
+
+    cout << "Nume fisier .csv cu fluentele de neutroni (fara extensia .csv): "; cin >> filename_phi;
+    cout << "Nume fisier .csv cu matricea de raspuns (fara extensia .csv): "; cin >> filename_R;
+
+    // 1. Extragerea datelor pentru phi
+    vector<vector<double>> phi_csv;  // matricea phi din fisierul .csv
+    ifile.open((filename_phi + ".csv").c_str());
+    if(!ifile) { cout << filename_phi << ".csv nu exista." << endl; }
+    if(ifile)
+    {
+        int aux = 0;
+        string line;
+
+        while(getline(ifile, line))
+        {
+            vector<double> row;
+            stringstream ss(line);
+            string value;
+            while(getline(ss, value, ','))
+            {
+                row.push_back(stod(value));  // stod converteste string in double;  stoi converteste string in int
+                if(aux == 0) { n_samples++; }
+            }
+            phi_csv.push_back(row);  // adauga intreaga linie in matricea phi_csv
+            if(aux == 0) { aux = 1; }
+            n_energy_groups++;
+        }
+
+        ifile.close();
+    }
+    // 2. Extragerea datelor pentru R
+    vector<vector<double>> R_csv;  // matricea R din fisierul .csv
+    ifile.open((filename_R + ".csv").c_str());
+    if(!ifile) { cout << filename_R << ".csv nu exista." << endl; }
+    if(ifile)
+    {
+        int aux = 0;
+        string line;
+
+        while(getline(ifile, line))
+        {
+            vector<double> row;
+            stringstream ss(line);
+            string value;
+            while(getline(ss, value, ','))
+            {
+                row.push_back(stod(value));
+                if(aux == 0) { n_detectors++; }
+            }
+            R_csv.push_back(row);
+            if(aux == 0) { aux = 1; }
+        }
+    }
+
+    // -----------------------------------------------------------------
+    // | Convertirea lui phi din unit. de letargie in unit. de energie |
+    // -----------------------------------------------------------------
+    double phi_converted[n_energy_groups-1][n_samples-1], R_converted[n_energy_groups-1][n_detectors-1];
+    
+
+    // ---------------------------
+    // | Incarcarea lui phi si R |
+    // ---------------------------
+    n_samples = n_samples - 1;              // prima coloana din .csv fiind energia
+    n_energy_groups = n_energy_groups - 1;  // ultima coloana din .csv fiind upper bin-ul
+    double phi[n_samples][n_energy_groups], R[n_detectors][n_energy_groups];
 }
 
 
 /*
-Observatii:  C[i][j] = nr. de counturi produse cu spectrul i de detectorul j
-          :  nr. neuroni din pattern layer = nr. training samples
+Observatii:  C[i][j] = nr. de counturi produse cu spectrul i de detectorul j.
+          :  nr. neuroni din pattern layer = nr. training samples.
 */
 return 0;
 }
