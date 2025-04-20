@@ -513,6 +513,7 @@ else
     }
     else
     {
+        // Adaugarea celei mai "bune" valori ale lui sigma:
         sigma = 0.15;
         for(int i=0; i<n_samples_test; i++)
         {
@@ -583,6 +584,64 @@ else
             ofile.close();
             cout << "File " + filename + " created successfully." << endl;
         }
+    }
+
+
+    // =======================================================
+    // || PREDICTIE y_exp PENTRU MASURATORILE EXPERIMENTALE ||
+    // =======================================================
+    // Input-ul va fi un singur vector (1 linie). Nr. de neuroni ramane egal cu n_samples_train.
+    bool experimental_data = false;
+    if(experimental_data == true)
+    {
+        double X_exp[n_detectors];      // vectorul experimental al carui output trebuie prezis
+        double y_exp[n_energy_groups];  // spectrul prezis
+        double d[n_samples_train], w[n_samples_train];
+        // ---------------------------------------------------
+        // | Adaugarea valorilor masurate pentru n_detectors |
+        // ---------------------------------------------------
+        for(int i=0; i<n_detectors; i++)
+        {
+            if(i == 0) { cout << "\nIntroducerea valorilor afisate de cei " << n_detectors << " detectori:" << endl; }
+            cout << "C_exp[" << i << "] = "; cin >> X_exp[i];
+        }
+    
+        // ----------------------------------------------------------------
+        // | Determinarea neuronilor si a spectrului (vectorul de output) |
+        // ----------------------------------------------------------------
+        for(int i=0; i<n_samples_train; i++)
+        {
+            double sum = 0;
+            for(int j=0; j<n_detectors; j++)
+            {
+                sum += (X_exp[j] - X_train[i][j]) * (X_exp[j] - X_train[i][j]);
+            }
+            d[i] = sqrt(sum);
+            w[i] = gaussian(d[i], sigma);
+        }
+        for(int i=0; i<n_energy_groups; i++)
+        {
+            double numarator = 0;
+            double numitor = 0;
+            for(int j=0; j<n_samples_train; j++)
+            {
+                numarator += w[j] * y_train[j][i];
+                numitor += w[j];
+            }
+            y_exp[i] = numarator / numitor;
+        }
+
+        // -------------------
+        // | Salvare spectru |
+        // -------------------
+        ofstream ofile;
+        ofile.open("unfolded_spectrum.txt");
+        for(int i=0; i<n_energy_groups; i++)
+        {
+            if(i == 0) { ofile << "Energy group  ,  y_exp" << endl; }
+            ofile << i << " " << y_exp[i] << endl;
+        }
+        ofile.close();
     }
 }
 
