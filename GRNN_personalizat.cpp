@@ -218,6 +218,7 @@ if(random_gen == true)
             }
         }
         mse = mse / (n_samples_test * n_energy_groups);
+        cout << "mean_squared_error(y_test, y_pred) = " << mse << endl;
     }
     
 
@@ -553,6 +554,7 @@ else
             }
         }
         mse = mse / (n_samples_test * n_energy_groups);
+        cout << "mean_squared_error(y_test, y_pred) = " << mse << endl;
     }
     
 
