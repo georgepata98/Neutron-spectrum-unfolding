@@ -1,2 +1,2 @@
 - Matricea de raspuns R trebuie sa aiba pe linii numarul de detectori (i.e. m = 8 linii), si pe coloane sa fie raspunsurile in functie de grupul de energie (i.e. n = 53 coloane). 😀️
-- La fel si fluentele phi, pe linii trebuie sa fie vectorii de fluenta si pe coloane valorile lor in functie de grupul de energie
+- La fel si fluentele phi, pe linii trebuie sa fie vectorii de fluenta si pe coloane valorile lor in functie de grupul de energie.
