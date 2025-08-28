@@ -9,7 +9,8 @@
 using namespace std;
 
 
-double gaussian(double dist, double sigma) {
+double gaussian(double dist, double sigma)
+{
     return exp(-(pow(dist,2)) / (2*pow(sigma,2)));
 }
 
@@ -337,18 +338,18 @@ else
     {
         for(int j=0; j<n_samples; j++)
         {
-            if(j>0 && i<n_energy_groups-1)  // skip coloana cu energii si linia cu upper bin
+            if(j>0 && i<n_energy_groups-1)  // skip coloana cu energii (coloana 0) si linia cu upper bin (ultima linie din setul de date)
             {
                 phi_converted[i][j-1] = phi_csv[i][j] * (log(phi_csv[i+1][0]) - log(phi_csv[i][0]));
             }
         }
     }
-    // 2. Scaderea dimensiunii lui R cu 1 linie si 1 coloana
+    // 2. Scaderea dimensiunii lui R cu 1 linie si 1 coloana, ca la phi
     for(int i=0; i<n_energy_groups; i++)
     {
         for(int j=0; j<n_detectors; j++)
         {
-            if(j>0 && i<n_energy_groups-1)  // skip coloana cu energii si linia cu upper bin
+            if(j>0 && i<n_energy_groups-1)  // skip coloana cu energii (coloana 0) si linia cu upper bin (ultima linie din setul de date)
             {
                 R_converted[i][j-1] = R_csv[i][j];
             }
@@ -358,9 +359,9 @@ else
     // ---------------------------
     // | Incarcarea lui phi si R |
     // ---------------------------
-    n_samples = n_samples - 1;              // prima coloana din .csv fiind energia
-    n_energy_groups = n_energy_groups - 1;  // ultima linie din .csv fiind upper bin-ul
-    n_detectors = n_detectors - 1;
+    n_samples = n_samples - 1;              // deoarece prima coloana din .csv era energia
+    n_energy_groups = n_energy_groups - 1;  // deoarece ultima linie din .csv era upper bin-ul
+    n_detectors = n_detectors - 1;          // deoarece prima coloana din .csv era energia
     double phi[n_samples][n_energy_groups], R[n_detectors][n_energy_groups];
     // phi_converted si R_converted au aceeasi dimensiune ca phi si R, dar sunt transpusele lor
     // 1. Incarcarea lui phi
@@ -468,7 +469,7 @@ else
     {
         ofstream msefile;  // mse functie de sigma
         msefile.open("mse_data.txt");
-        for(sigma=0.1; sigma<5; sigma+=0.01)  // Wang et al., 2019
+        for(sigma=0.1; sigma<3; sigma+=0.01)  // Wang et al., 2019
         {
             for(int i=0; i<n_samples_test; i++)
             {
@@ -572,6 +573,7 @@ else
         {
             cout << "X_test[" << index << "] doesn't exist.\nindex = "; cin >> index;
         }
+        
         // --- Incarcarea y_test[index], y_train[index] intr-un fisier de output ---
         if(index>=0 && index<n_samples_test)
         {
@@ -589,14 +591,23 @@ else
     }
 
 
-    // =======================================================
-    // || PREDICTIE y_exp PENTRU MASURATORILE EXPERIMENTALE ||
-    // =======================================================
+
+    // =====================================================
+    // | PREDICTIE y_exp PENTRU MASURATORILE EXPERIMENTALE |
+    // =====================================================
     // Input-ul va fi un singur vector (1 linie). Nr. de neuroni ramane egal cu n_samples_train.
+    
+    // !!!!!!!!!
+    // IMPORTANT
+    // !!!!!!!!!
+    
+    // Cred ca nr. detectori n_detectors trebuie sa fie egal cu nr. detectori din matricea de raspuns R_matrix.csv (adica cu nr. col. din fisier) si sa fie de acelasi tip (acelasi diametru - se poate modifica fisierul Excel); trebuie reinteles programul (in special partea asta cu predictia) daca este sa trebuiasca sa prezic un spectru.
+    
+    
     bool experimental_data = false;
     if(experimental_data == true)
     {
-        double X_exp[n_detectors];      // vectorul experimental al carui output trebuie prezis
+        double X_exp[n_detectors];      // vectorul experimental cu nr. counturi
         double y_exp[n_energy_groups];  // spectrul prezis
         double d[n_samples_train], w[n_samples_train];
         // ---------------------------------------------------
@@ -604,8 +615,8 @@ else
         // ---------------------------------------------------
         for(int i=0; i<n_detectors; i++)
         {
-            if(i == 0) { cout << "\nIntroducerea valorilor afisate de cei " << n_detectors << " detectori:" << endl; }
-            cout << "C_exp[" << i << "] = "; cin >> X_exp[i];
+            if(i == 0) { cout << "\nIntroduceti ratele experimentale corectate pt. cei " << n_detectors << " detectori:" << endl; }
+            cout << "C_exp[" << i+1 << "] = "; cin >> X_exp[i];
         }
     
         // ----------------------------------------------------------------
@@ -649,7 +660,7 @@ else
 
 
 /*
-Observatii:  C[i][j] = nr. de counturi produse cu spectrul i de detectorul j.
+Observatii:  C[i][j] = nr. de counturi produse de spectrul i cu detectorul j.
           :  nr. neuroni din pattern layer = nr. training samples.
 */
 return 0;
