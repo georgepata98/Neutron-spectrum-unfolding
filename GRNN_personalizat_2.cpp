@@ -201,7 +201,7 @@ int main()
     ofile.open("spectru_exp_prezis.txt");
     for(int i=0; i<n_energy_groups; i++)
     {
-        if(i == 0) { ofile << "Energy group  ,  y_exp" << endl; }
+        if(i == 0) { ofile << "Energy group Eg  |  Phi(Eg)" << endl; }
         ofile << i+1 << " " << y_exp[i] << endl;
     }
     ofile.close();
