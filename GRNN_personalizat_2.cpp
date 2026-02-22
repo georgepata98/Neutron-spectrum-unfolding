@@ -168,7 +168,7 @@ int main()
     for(int i=0; i<n_detectors; i++)
     {
         if(i == 0) { cout << "\nIntroduceti ratele experimentale corectate pt. cei " << n_detectors << " detectori:" << endl; }
-        cout << "C_exp[" << i+1 << "] = "; cin >> X_exp[i];
+        cout << "Cts[" << i+1 << "] = "; cin >> X_exp[i];
     }
 
     for(int i=0; i<n_samples; i++)
